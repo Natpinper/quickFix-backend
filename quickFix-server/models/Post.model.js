@@ -8,16 +8,8 @@ const postSchema = new Schema(
             type: String,
             required: true,
         },
-        service: {
-            category: {
-                type: String,
-                required: [true, "Select a category."]
-            },
-            subcategory: {
-                type: String,
-                required:  [true, "Select a category."]
-            }
-        },
+        service: {type: Schema.Types.ObjectId, ref: "Service"},
+        
         description: {
             type: String,
             required: true

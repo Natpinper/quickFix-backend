@@ -3,21 +3,25 @@ const router = express.Router();
 const mongoose = require("mongoose");
 
 const User = require("../models/User.model");
-const Services = require("../models/Services.model");
+const Service = require("../models/Services.model");
 const Post = require("../models/Post.model");
 
 //Create a new Post - POST /api/post
 
 router.post("/post", (req, res, next) => {
-  const { title, service, description, price, userId } = req.body;
+  const { title, serviceId, description, price, userId } = req.body;
 
-  Post.create({ title, service, description, price, user: userId })
+  Post.create({ title, service: serviceId, description, price, user: userId })
     .then((newPost) => {
-      res.json(newPost);
-      console.log(newPost)
+      Service.findByIdAndUpdate(serviceId, {
+        $push: { posts: newPost._id },
+      }).then((updatedService) => {
+        res.json(newPost);
+        console.log(newPost);
+      });
     })
     .catch((err) => {
-      res.json(err)
+      res.json(err);
     });
 });
 
@@ -85,7 +89,9 @@ router.delete("/post/:postId", (req, res, next) => {
 
   Post.findByIdAndDelete(postId)
     .then(() => {
-      res.json({ message: `Post with ${postId} id has been removed succesfully` });
+      res.json({
+        message: `Post with ${postId} id has been removed succesfully`,
+      });
     })
     .catch((err) => {
       res.json(err);
