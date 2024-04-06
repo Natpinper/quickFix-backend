@@ -9,15 +9,15 @@ const Post = require("../models/Post.model");
 //Create a new Post - POST /api/post
 
 router.post("/post", (req, res, next) => {
-  const { title, description, price, userId } = req.body;
+  const { title, service, description, price, userId } = req.body;
 
-  Post.create({ title, description, price, user: userId })
+  Post.create({ title, service, description, price, user: userId })
     .then((newPost) => {
       res.json(newPost);
       console.log(newPost)
     })
     .catch((err) => {
-      res.json(err);
+      res.json(err)
     });
 });
 
@@ -85,7 +85,7 @@ router.delete("/post/:postId", (req, res, next) => {
 
   Post.findByIdAndDelete(postId)
     .then(() => {
-      res.json({ message: `Post with ${postId} has been removed succesfully` });
+      res.json({ message: `Post with ${postId} id has been removed succesfully` });
     })
     .catch((err) => {
       res.json(err);

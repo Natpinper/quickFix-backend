@@ -8,6 +8,16 @@ const postSchema = new Schema(
             type: String,
             required: true,
         },
+        service: {
+            category: {
+                type: String,
+                required: [true, "Select a category."]
+            },
+            subcategory: {
+                type: String,
+                required:  [true, "Select a category."]
+            }
+        },
         description: {
             type: String,
             required: true
