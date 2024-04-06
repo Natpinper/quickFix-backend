@@ -16,7 +16,7 @@ const postSchema = new Schema(
             type: Number,
             min: 0,
         },
-        user: [{type: Schema.Types.ObjectId, ref: "User"}]
+        user: {type: Schema.Types.ObjectId, ref: "User"}
     }
 )
 
