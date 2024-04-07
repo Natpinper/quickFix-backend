@@ -21,9 +21,21 @@ router.get("/services", (req,res,next)=>{
       });
 })
 
-//Get services based on its category GET /api/services/category
+//Get services based on its category GET /api/services/:category
 
+router.get("/services/category", async (req,res)=>{
+   
+    const categories= req.query.category ? req.query.category.split(','):[]
+    const filteredByCategories = categories.length > 0 ? {category: {$in: categories}}:{}
 
-
+    Service.find(filteredByCategories)
+    .populate('posts')
+    .then((categoryServices)=>{
+        res.json(categoryServices)
+    })
+    .catch((err)=>{
+        res.json(err)
+    })
+})
 
 module.exports = router;
