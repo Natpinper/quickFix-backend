@@ -24,7 +24,7 @@ app.use("/auth", authRoutes);
 
 
 app.use("/api", require('./routes/post.routes'))
-app.use("/api", require('./routes/user.routes'))
+app.use("/api",isAuthenticated, require('./routes/user.routes'))
 app.use("/api", require("./routes/services.routes"))
 
 // ❗ To handle errors. Routes that don't exist or errors that you handle in specific routes

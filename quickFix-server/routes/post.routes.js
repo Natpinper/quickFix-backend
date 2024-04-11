@@ -6,24 +6,7 @@ const User = require("../models/User.model");
 const Service = require("../models/Services.model");
 const Post = require("../models/Post.model");
 
-//Create a new Post - POST /api/post
 
-router.post("/post", (req, res, next) => {
-  const { title, serviceId, description, price, userId } = req.body;
-
-  Post.create({ title, service: serviceId, description, price, user: userId })
-    .then((newPost) => {
-      Service.findByIdAndUpdate(serviceId, {
-        $push: { posts: newPost._id },
-      }).then((updatedService) => {
-        res.json(newPost);
-        console.log(newPost);
-      });
-    })
-    .catch((err) => {
-      res.json(err);
-    });
-});
 
 // Retrieves all posts  GET /api/post
 
