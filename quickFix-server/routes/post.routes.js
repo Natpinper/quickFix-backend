@@ -13,6 +13,7 @@ const Post = require("../models/Post.model");
 router.get("/post", (req, res, next) => {
   Post.find()
     .populate("user")
+    .populate("service")
     .then((allPosts) => {
       res.json(allPosts);
     })
@@ -32,7 +33,8 @@ router.get("/post/:postId", (req, res, next) => {
   }
 
   Post.findById(postId)
-    .populate("user")
+    .populate({path: "user", select: "-password -email -posts"})
+    .populate({path: "service", select : "-posts"})
     .then((onePost) => {
       res.status(200).json(onePost);
     })

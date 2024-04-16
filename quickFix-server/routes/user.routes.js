@@ -12,7 +12,7 @@ const Post = require("../models/Post.model");
 //Retrieves all users GET /api/user
 
 router.get("/user", (req,res,next)=>{
-    User.find()
+    User.find().select("-password -email")
     .populate("posts")
     .then((allUsers)=>{
         res.json(allUsers)
@@ -32,7 +32,7 @@ router.get("/user/:userId", (req,res,next)=>{
         res.status(400).json({ message: "Specified id is not valid" });
         return;
       }
-      User.findById(userId)
+      User.findById(userId).select("-password -email")
       .populate("posts")
       .then((oneUser) => {
         res.status(200).json(oneUser);
