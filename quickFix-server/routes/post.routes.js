@@ -12,8 +12,8 @@ const Post = require("../models/Post.model");
 
 router.get("/post", (req, res, next) => {
   Post.find()
-    .populate("user")
-    .populate("service")
+    .populate({path: "user", select: "-password -email -posts"})
+    .populate({path: "service", select: "-posts"})
     .then((allPosts) => {
       res.json(allPosts);
     })

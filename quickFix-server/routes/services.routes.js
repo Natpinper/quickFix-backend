@@ -3,7 +3,6 @@ const router = express.Router();
 const mongoose = require("mongoose");
 
 const User = require("../models/User.model");
-const Services = require("../models/Services.model");
 const Post = require("../models/Post.model");
 const Service = require("../models/Services.model");
 
@@ -12,7 +11,7 @@ const Service = require("../models/Services.model");
 
 router.get("/services", (req,res,next)=>{
     Service.find(req.query)
-    .populate("posts")
+    .populate({path:"posts", select: "-user"})
     .then((filteredServices)=>{
         res.json(filteredServices)
     })
