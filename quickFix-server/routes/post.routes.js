@@ -44,6 +44,25 @@ router.get("/post/:postId", (req, res, next) => {
     });
 });
 
+//Create a new Post - POST /api/post
+
+router.post("/post", (req, res, next) => {
+  const { title, serviceId, description, price, userId } = req.body;
+
+  Post.create({ title, service: serviceId, description, price, user: userId })
+    .then((newPost) => {
+      User.findByIdAndUpdate(userId, {
+        $push: { posts: newPost._id },
+      }).then((updatedUser) => {
+        res.json(updatedUser);
+        console.log(updatedUser);
+      });
+    })
+    .catch((err) => {
+      res.json(err);
+    });
+});
+
 //Updates one specific post PUT /api/post/:postId
 
 router.put("/post/:postId", (req, res, next) => {
