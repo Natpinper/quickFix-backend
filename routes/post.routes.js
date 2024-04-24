@@ -14,7 +14,7 @@ router.get("/post", (req, res, next) => {
   Post.find()
     .populate({path: "user", select: "-password -email -posts"})
     .populate({path: "service", select: "-posts"})
-    .limit(9)
+    .limit(20)
     .then((allPosts) => {
       res.json(allPosts);
     })

@@ -7,8 +7,20 @@ const Services = require("../models/Services.model");
 const Post = require("../models/Post.model");
 
 
+//Creates a new User POST /api/user
 
+router.post("/user", (req, res, next) => {
+  const { email, password, name, location } = req.body;
 
+  User.create({ email, password, name, location })
+    .then((newUser) => {
+      res.json(newUser)
+      console.log(newUser)
+      })
+    .catch((err) => {
+      res.json(err);
+    });
+  })
 //Retrieves all users GET /api/user
 
 router.get("/user", (req,res,next)=>{
@@ -23,7 +35,7 @@ router.get("/user", (req,res,next)=>{
 })
 
 
-//Retrieves one user by its GET id /api/user/:userId
+//Retrieves one user by its id GET /api/user/:userId
 
 router.get("/user/:userId", (req,res,next)=>{
     const {userId} = req.params
@@ -76,45 +88,5 @@ router.delete("/user/:userId", (req,res,next)=>{
 })
 
 
-
-//Updates one specific post PUT /api/post/:postId
-
-router.put("/post/:postId", (req, res, next) => {
-  const { postId } = req.params;
-
-  if (!mongoose.Types.ObjectId.isValid(postId)) {
-    res.status(400).json({ message: "Specified id is not valid" });
-    return;
-  }
-
-  Post.findByIdAndUpdate(postId, req.body, { new: true })
-    .then((updatedPost) => {
-      res.json(updatedPost);
-    })
-    .catch((err) => {
-      res.json(err);
-    });
-});
-
-//Deletes a specific post by its id DELETE /api/post/:postId
-
-router.delete("/post/:postId", (req, res, next) => {
-  const { postId } = req.params;
-
-  if (!mongoose.Types.ObjectId.isValid(postId)) {
-    res.status(400).json({ message: "Specified id is not valid" });
-    return;
-  }
-
-  Post.findByIdAndDelete(postId)
-    .then(() => {
-      res.json({
-        message: `Post with ${postId} id has been removed succesfully`,
-      });
-    })
-    .catch((err) => {
-      res.json(err);
-    });
-});
 
 module.exports = router;
