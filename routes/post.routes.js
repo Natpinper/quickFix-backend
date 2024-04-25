@@ -14,7 +14,7 @@ router.get("/post", (req, res, next) => {
   Post.find()
     .populate({path: "user", select: "-password -email -posts"})
     .populate({path: "service", select: "-posts"})
-    .limit(20)
+    .limit(21)
     .then((allPosts) => {
       res.json(allPosts);
     })
@@ -43,6 +43,22 @@ router.get("/post/:postId", (req, res, next) => {
       res.json(err);
     });
 });
+//Route for filtering GET /api/post
+
+router.get('/post', async(req,res)=>{
+  try{
+    const{category, subcategory, location} = req.query
+const query={}
+if(category) query['service.category']= category
+if(subcategory) query['service.category.subcategory']= subcategory
+if(location) query['user.location']= location
+const posts = await Post.find(query)
+res.jason(posts)
+  }catch(error){
+    console.log(error)
+    res.json(error)
+  }
+})
 
 //Create a new Post - POST /api/post
 
