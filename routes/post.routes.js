@@ -6,14 +6,12 @@ const User = require("../models/User.model");
 const Service = require("../models/Services.model");
 const Post = require("../models/Post.model");
 
-
-
 // Retrieves all posts  GET /api/post
 
 router.get("/post", (req, res, next) => {
   Post.find()
-    .populate({path: "user", select: "-password -email -posts"})
-    .populate({path: "service", select: "-posts"})
+    .populate({ path: "user", select: "-password -email -posts" })
+    .populate({ path: "service", select: "-posts" })
     .limit(30)
     .then((allPosts) => {
       res.json(allPosts);
@@ -34,8 +32,8 @@ router.get("/post/:postId", (req, res, next) => {
   }
 
   Post.findById(postId)
-    .populate({path: "user", select: "-password -email -posts"})
-    .populate({path: "service", select : "-posts"})
+    .populate({ path: "user", select: "-password -email -posts" })
+    .populate({ path: "service", select: "-posts" })
     .then((onePost) => {
       res.status(200).json(onePost);
     })
@@ -45,40 +43,43 @@ router.get("/post/:postId", (req, res, next) => {
 });
 //Route for filtering GET /api/post
 
-router.get('/post', async(req,res)=>{
-  try{
-    const{category, subcategory, location} = req.query
-const query={}
-if(category) query['service.category']= category
-if(subcategory) query['service.category.subcategory']= subcategory
-if(location) query['user.location']= location
-const posts = await Post.find(query)
-res.json(posts)
-  }catch(error){
-    console.log(error)
-    res.json(error)
+router.get("/post", async (req, res) => {
+  try {
+    const { category, subcategory, location } = req.query;
+    const query = {};
+    if (category) query["service.category"] = category;
+    if (subcategory) query["service.category.subcategory"] = subcategory;
+    if (location) query["user.location"] = location;
+    const posts = await Post.find(query);
+    res.json(posts);
+  } catch (error) {
+    console.log(error);
+    res.json(error);
   }
-})
+});
 
 //Create a new Post - POST /api/post
 
 router.post("/post", (req, res, next) => {
-  const { title, serviceId, description, price, userId } = req.body;
+  const { title, service, description, price, user } = req.body;
+  console.log("req/bdoy", req.body);
 
-  Post.create({ title, service: serviceId, description, price, user: userId })
+  let globalPostId = "";
+  Post.create({ title, service, description, price, user })
     .then((newPost) => {
-      User.findByIdAndUpdate(userId, {
+      globalPostId = newPost._id;
+      return User.findByIdAndUpdate(user, {
         $push: { posts: newPost._id },
-      }).then((updatedUser) => {
-        res.json(updatedUser);
-        console.log(updatedUser);
       });
-      Service.findByIdAndUpdate(serviceId, {
-        $push: { posts: newPost._id },
-      }).then((updatedService) => {
-        res.json(updatedService);
-        console.log(updatedService);
+    })
+    .then((updatedUser) => {
+      return Service.findByIdAndUpdate(service, {
+        $push: { posts: globalPostId },
       });
+    })
+    .then((updatedService) => {
+      res.json(updatedService);
+      console.log(updatedService);
     })
     .catch((err) => {
       res.json(err);
