@@ -14,7 +14,7 @@ router.get("/post", (req, res, next) => {
   Post.find()
     .populate({path: "user", select: "-password -email -posts"})
     .populate({path: "service", select: "-posts"})
-    .limit(21)
+    .limit(30)
     .then((allPosts) => {
       res.json(allPosts);
     })
@@ -53,7 +53,7 @@ if(category) query['service.category']= category
 if(subcategory) query['service.category.subcategory']= subcategory
 if(location) query['user.location']= location
 const posts = await Post.find(query)
-res.jason(posts)
+res.json(posts)
   }catch(error){
     console.log(error)
     res.json(error)
@@ -72,6 +72,12 @@ router.post("/post", (req, res, next) => {
       }).then((updatedUser) => {
         res.json(updatedUser);
         console.log(updatedUser);
+      });
+      Service.findByIdAndUpdate(serviceId, {
+        $push: { posts: newPost._id },
+      }).then((updatedService) => {
+        res.json(updatedService);
+        console.log(updatedService);
       });
     })
     .catch((err) => {
