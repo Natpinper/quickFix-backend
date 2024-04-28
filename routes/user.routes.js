@@ -48,6 +48,7 @@ router.get("/user/:userId", (req,res,next)=>{
       .populate("posts")
       .then((oneUser) => {
         res.status(200).json(oneUser);
+        console.log(oneUser)
       })
       .catch((err) => {
         res.json(err);
@@ -56,7 +57,7 @@ router.get("/user/:userId", (req,res,next)=>{
 
 //Updates one specific user PUT  /api/user/:userId
 
-router.get("/user/:userId", (req,res,next)=>{
+router.put("/user/:userId", (req,res,next)=>{
     const {userId} = req.params
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
