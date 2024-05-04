@@ -12,7 +12,7 @@ router.get("/post", (req, res, next) => {
   Post.find()
     .populate({ path: "user", select: "-password -email -posts" })
     .populate({ path: "service", select: "-posts" })
-    .limit(30)
+    .limit(14)
     .then((allPosts) => {
       res.json(allPosts);
     })
@@ -41,21 +41,24 @@ router.get("/post/:postId", (req, res, next) => {
       res.json(err);
     });
 });
-//Route for filtering GET /api/post
+//USer Posts `/user/post/${_id}`
+router.get("/user/post/:postId", (req, res, next) => {
+  const { postId } = req.params;
 
-router.get("/post", async (req, res) => {
-  try {
-    const { category, subcategory, location } = req.query;
-    const query = {};
-    if (category) query["service.category"] = category;
-    if (subcategory) query["service.category.subcategory"] = subcategory;
-    if (location) query["user.location"] = location;
-    const posts = await Post.find(query);
-    res.json(posts);
-  } catch (error) {
-    console.log(error);
-    res.json(error);
+  if (!mongoose.Types.ObjectId.isValid(postId)) {
+    res.status(400).json({ message: "Specified id is not valid" });
+    return;
   }
+
+  Post.findById(postId)
+    .populate({ path: "user", select: "-password -email -posts" })
+    .populate({ path: "service", select: "-posts" })
+    .then((onePost) => {
+      res.status(200).json(onePost);
+    })
+    .catch((err) => {
+      res.json(err);
+    });
 });
 
 //Create a new Post - POST /api/post
@@ -116,6 +119,11 @@ router.delete("/post/:postId", (req, res, next) => {
   }
 
   Post.findByIdAndDelete(postId)
+    .then((deletedPost) => {
+      return User.findByIdAndUpdate(deletedPost.user, {
+        $pull: { posts: postId },
+      });
+    })
     .then(() => {
       res.json({
         message: `Post with ${postId} id has been removed succesfully`,
