@@ -7,7 +7,33 @@ const Service = require("../models/Services.model");
 const Post = require("../models/Post.model");
 
 // Retrieves all posts  GET /api/post
+router.get("/posts", async (req, res, next) => {
+  try {
+    // Assuming Post is your Mongoose model for posts
+    const allPosts = await Post.find()
+      .populate({ path: "user", select: "-password -email -posts" })
+      .populate({ path: "service", select: "-posts" });
 
+    // Shuffle the array of posts
+    const shuffledPosts = shuffleArray(allPosts);
+
+    // Select the first 14 posts
+    const randomPosts = shuffledPosts.slice(0, 14);
+
+    res.json(randomPosts);
+  } catch (err) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Function to shuffle an array
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
 router.get("/post", (req, res, next) => {
   Post.find()
     .populate({ path: "user", select: "-password -email -posts" })

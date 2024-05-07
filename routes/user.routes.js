@@ -6,12 +6,14 @@ const User = require("../models/User.model");
 const Services = require("../models/Services.model");
 const Post = require("../models/Post.model");
 
+
+const fileUploader = require("../config/cloudinary.config")
 //Creates a new User POST /api/user
 
 router.post("/user", (req, res, next) => {
-  const { email, password, name, location } = req.body;
+  const { email, password, name, location, imageUrl } = req.body;
 
-  User.create({ email, password, name, location })
+  User.create({ email, password, name, location, imageUrl })
     .then((newUser) => {
       res.json(newUser);
       console.log(newUser);
@@ -19,6 +21,21 @@ router.post("/user", (req, res, next) => {
     .catch((err) => {
       res.json(err);
     });
+});
+
+// POST "/api/upload" => Route that receives the image, sends it to Cloudinary via the fileUploader and returns the image URL
+router.post("/upload", fileUploader.single("imageUrl"), (req, res, next) => {
+  // console.log("file is: ", req.file)
+ 
+  if (!req.file) {
+    next(new Error("No file uploaded!"));
+    return;
+  }
+  
+  // Get the URL of the uploaded file and send it as a response.
+  // 'fileUrl' can be any name, just make sure you remember to use the same when accessing it on the frontend
+  
+  res.json({ fileUrl: req.file.path });
 });
 //Retrieves all users GET /api/user
 
@@ -45,7 +62,7 @@ router.get("/user/:userId", (req, res, next) => {
   }
   User.findById(userId)
     .select("-password")
-    .populate("posts")
+    .populate({path:"posts", populate: {path: "service"}})
     .then((oneUser) => {
       res.status(200).json(oneUser);
       console.log(oneUser);
