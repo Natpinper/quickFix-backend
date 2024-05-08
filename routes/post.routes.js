@@ -6,35 +6,28 @@ const User = require("../models/User.model");
 const Service = require("../models/Services.model");
 const Post = require("../models/Post.model");
 
-// Retrieves all posts  GET /api/post
-router.get("/posts", async (req, res, next) => {
+//GET random posts in HomePage GET /api/post
+router.get('/post', async (req, res) => {
   try {
-    // Assuming Post is your Mongoose model for posts
-    const allPosts = await Post.find()
-      .populate({ path: "user", select: "-password -email -posts" })
-      .populate({ path: "service", select: "-posts" });
+    let posts = await Post.aggregate([
+      { $sample: { size: 14 } }
+    ]);
 
-    // Shuffle the array of posts
-    const shuffledPosts = shuffleArray(allPosts);
+    let populatedPosts = await Post.populate(posts, [
+      { path: "user", select: "-password -email -posts" },
+      { path: "service", select: "-posts" }
+    ]);
 
-    // Select the first 14 posts
-    const randomPosts = shuffledPosts.slice(0, 14);
-
-    res.json(randomPosts);
+    console.log(populatedPosts);
+    res.json(populatedPosts);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Internal server error" });
   }
 });
+// Retrieves all posts  GET /api/post/location for the filtering by location function in HomePage
 
-// Function to shuffle an array
-function shuffleArray(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-}
-router.get("/post", (req, res, next) => {
+router.get("/post/location", (req, res, next) => {
   Post.find()
     .populate({ path: "user", select: "-password -email -posts" })
     .populate({ path: "service", select: "-posts" })
@@ -45,7 +38,7 @@ router.get("/post", (req, res, next) => {
     .catch((err) => {
       res.json(err);
     });
-});
+}); 
 
 // Retrieves one specific post by its id GET /api/post/:postId
 
