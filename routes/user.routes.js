@@ -62,7 +62,7 @@ router.get("/user/:userId", (req, res, next) => {
   }
   User.findById(userId)
     .select("-password")
-    .populate({path:"posts", populate: {path: "service"}})
+    .populate({path:"posts", populate: {path: "service user"}})
     .then((oneUser) => {
       res.status(200).json(oneUser);
       console.log(oneUser);
