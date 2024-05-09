@@ -31,7 +31,6 @@ router.get("/post/location", (req, res, next) => {
   Post.find()
     .populate({ path: "user", select: "-password -email -posts" })
     .populate({ path: "service", select: "-posts" })
-    .limit(14)
     .then((allPosts) => {
       res.json(allPosts);
     })
